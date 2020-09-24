@@ -1,0 +1,230 @@
+//Вопрос: прописывать ли метод main, так как в задании об этом не сказано.
+package com.company;
+import java.util.Scanner;
+
+public class Customer{
+    private final String name;
+    private final String lastName;
+    private Account account;
+
+    public Customer(String name, String lastName) {
+        this.name = name;
+        this.lastName = lastName;
+    }
+
+    /**
+     * Opens account for a customer (creates Account and sets it to field "account").
+     * Customer can't have greater than one opened account.
+     *
+     * @param accountId id of the account
+     * @return true if account hasn't already created, otherwise returns false and prints "Customer fullName() already has the active account"
+     */
+    public boolean openAccount(long accountId) {
+        if (account == null) {
+            account = new Account(accountId);
+            return true;
+        } else {
+            System.out.println("Customer "+fullName()+" already has the active account");
+            return false;
+        }
+    }
+
+    /**
+     * Closes account. Sets account to null.
+     *
+     * @return false if account is already null and prints "Customer fullName() has no active account to close", otherwise sets account to null and returns true
+     */
+    public boolean closeAccount() {
+        if (account == null) {
+            System.out.println("Customer "+fullName()+" has no active account to close");
+            return false;
+        } else {
+            account = null;
+            return true;
+        }
+    }
+
+    /**
+     * Formatted full name of the customer
+     * @return concatenated form of name and lastName, e.g. "John Goodman"
+     */
+    public String fullName() {
+        if (name == null || name == "" || lastName == null || lastName == "") {
+            return "Customer has invalid name";
+        } else {
+            return name + lastName;
+        }
+    }
+
+    /**
+     * Delegates withdraw to Account class
+     * @param amount amount of money to withdraw
+     * @return false if account is null and prints "Customer fullName() has no active account", otherwise returns the result of Account's withdraw method
+     */
+    public boolean withdrawFromCurrentAccount(double amount) {
+        if (account == null) {
+            System.out.println("Customer "+fullName()+" has no active account");
+            return false;
+        } else {
+            return account.withdraw(amount);
+        }
+    }
+
+    /**
+     * Delegates adding money to Account class
+     * @param amount amount of money to add
+     * @return false if account is null and prints "Customer fullName() has no active account", otherwise returns the result of Account's add method
+     */
+    public boolean addMoneyToCurrentAccount(double amount) {
+        if (account == null) {
+            System.out.println("Customer "+fullName()+" has no active account");
+            return false;
+        } else {
+            return account.add(amount);
+        }
+    }
+}
+
+public class Account {
+    private final long id;
+    private double balance;
+
+    public Account(long id) {
+        this.id = id;
+    }
+
+    /**
+     * Withdraws money from account balance
+     *
+     * @param amount amount of money to withdraw
+     * @return true
+     * if amount &gt 0 and (balance - amount) &ge 0,
+     * otherwise returns false
+     */
+    public boolean withdraw(double amount) {
+        if (amount > 0 & (balance - amount) >= 0){ //предполагаю, что баланс может стать нулевым.
+            balance = balance - amount;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Adds money to account balance
+     *
+     * @param amount amount of money to add on account
+     * @return true if amount &gt 0, otherwise returns false
+     */
+    public boolean add(double amount) {
+        if (amount > 0) {
+            balance = balance + amount;
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+//Тесты
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.Assert;
+
+class CustomerTest extends Assert {
+    private Customer customer;
+    private final String name;
+    private final String lastName;
+    private final long id;
+    private Account account;
+
+    CustomerTest(String name, String lastName, long id) {
+        this.name = name;
+        this.lastName = lastName;
+        this.id = id;
+    }
+
+    @Before
+    public void initTest() {
+        customer = new Customer(name, lastName);
+        account = new Account(id);
+    }
+
+    @After
+    public void afterTest() {
+        customer = null;
+        account = null;
+    }
+
+    @Test
+    public void testOpenAccount() {
+        assertFalse(customer.openAccount(1));
+        assertTrue(customer.openAccount(1));
+        assertTrue(customer.openAccount(id));
+    }
+
+    @Test
+    public void testCloseAccount() {
+        assertTrue(customer.closeAccount());
+        assertFalse(customer.closeAccount());
+    }
+
+    @Test
+    public void testFullName() {
+        assertSame("Customer has invalid name", customer.fullName());
+        assertSame(name+lastName, customer.fullName());
+    }
+
+    @Test
+    public void testWithdrawFromCurrentAccount() {
+        assertTrue(customer.withdrawFromCurrentAccount(5));
+        assertTrue(customer.withdrawFromCurrentAccount(500));
+        assertFalse(customer.withdrawFromCurrentAccount(0));
+        assertFalse(customer.withdrawFromCurrentAccount(-10));
+    }
+
+    @Test
+    public void testAddMoneyToCurrentAccount() {
+        assertTrue(customer.addMoneyToCurrentAccount(500));
+        assertFalse(customer.addMoneyToCurrentAccount(0));
+        assertFalse(customer.addMoneyToCurrentAccount(-10));
+    }
+}
+
+public class AccountTest extends Assert{
+    private Account account;
+    private final long id;
+    private double balance;
+
+    public AccountTest(long id, double balance) {
+        this.id = id;
+        this.balance = balance;
+    }
+
+    @Before
+    public void initTest() {
+        account = new Account(id);
+    }
+
+    @After
+    public void afterTest() {
+        account = null;
+    }
+
+    @Test
+    public void testWithdraw() {
+        assertTrue(account.withdraw(5));
+        assertTrue(account.withdraw(500));
+        assertFalse(account.withdraw(0));
+        assertFalse(account.withdraw(-10));
+    }
+
+    @Test
+    public void testAdd() {
+        assertTrue(account.add(500));
+        assertFalse(account.add(0));
+        assertFalse(account.add(-10));
+    }
+}
