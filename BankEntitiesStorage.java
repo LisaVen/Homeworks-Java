@@ -70,4 +70,3 @@ public class SimpleEntitiesStorage implements BankEntitiesStorage {
     }
 }
 
-//create class AnalyticsManager

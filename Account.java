@@ -8,7 +8,7 @@ public interface Account {
     void addEntry(Object entry);
 }
 
-public class DebitCard {
+public class DebitCard implements Account{
     private final long id;
     private final TransactionManager transactionManager;
     private final Entries entries;
@@ -20,7 +20,6 @@ public class DebitCard {
         }
 
         //Посмотреть, сколько из реализованного реально надо. И доделать. В планах переконструировать все.
-
         /**
          * Withdraws money from account. <b>Should use TransactionManager to manage transactions</b>
          *
@@ -87,7 +86,7 @@ public class DebitCard {
             if (amount > 0){
                 Transaction createTransaction(amount);
                 entries.addEntry(originator); //originator??????
-                //currentBalance += amount BABY USE TRANSACTIONMANAGER
+                //currentBalance += amount  //USE TRANSACTIONMANAGER
                 return true;
             } else {
                 return false;
@@ -96,22 +95,10 @@ public class DebitCard {
 
 
         public Collection<Entry> history(LocalDate from, LocalDate to) {
-
-            //я так понимаю, тут выводятся все переводы деняк с одной даты по другую
+            //я так понимаю, тут выводятся все переводы денег с одной даты по другую
             return history(from, to);
         }
 
-        /**
-         * Calculates balance on the accounting entries basis
-         * @param date
-         * @return balance
-         */
-        public double balanceOn(LocalDate date) {
-            //принимает дату, не выводит историю за этот день
-            // history(date, date).containsAll();
-            double balance = 100; //на основе истории вычислить баланс
-            return balance;
-        }
 
         /**
          * Finds the last transaction of the account and rollbacks it
@@ -119,21 +106,40 @@ public class DebitCard {
         public void rollbackLastTransaction() {
             //удалить из коллекции и энтрис, видимо (еще проверю) последнюю транзакцию
         }
-}
-
-public class BonusAccount implements Account {
-
-   void withdraw(double amount, Account account){
-
-   }
-
+    /**
+     * Calculates balance on the accounting entries basis
+     * @param date
+     * @return balance
+     */
     @Override
     public double BalanceOn() {
-        return 0;
+        //принимает дату, не выводит историю за этот день
+        // history(date).containsAll();
+        double balance = 100; //на основе истории вычислить баланс (не смогла придумать пока что)
+        return balance;
     }
 
     @Override
     public void addEntry(Object entry) {
+        history().add(entry);
+    }
+}
 
+public class BonusAccount implements Account {
+    double bonuses;
+   void withdraw(double amount, Account account){
+        if (account != null){
+            bonuses += amount;
+        }
+   }
+
+    @Override
+    public double BalanceOn() {
+        return bonuses;
+    }
+
+    @Override
+    public void addEntry(Object entry) {
+        history.add(entry);//возможно, стоит вести отдельную коллекцию с входами для начисления бонусов.
     }
 }
