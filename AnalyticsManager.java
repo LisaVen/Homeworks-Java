@@ -1,8 +1,6 @@
 package com.company;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AnalyticsManager {
     public double overallBalanceOfAccounts(List accounts){
@@ -15,10 +13,24 @@ public class AnalyticsManager {
     }
 
     public Set uniqueKeysOf (List accounts, KeyExtractor keyExtractor){
-        //не успеваю, но как задача: необходимо вывести уникальные ключи.
+        Map uniqueKeys = new HashMap();
+        for (account : accounts){
+            uniqueKeys.putIfAbsent(keyExtractor, account);
+        }
+        return uniqueKeys.keySet();
     }
 
+
+
     public List accountsRangeFrom(List accounts, Account minAccount, Comparator comparator){
-        //задача: через компаратор отсортировать аккаунты от меньшего к большему по значению.
+        for (account : accounts){
+            int flag = comparator(account, minAccount);
+            if (flag < 0){
+                minAccount = account;
+            }
+        }
+        return accounts;
     }
+
+   // Optional<Entry> maxExpenseAmountEntryWithinInterval(List<Account> accounts, LocalDate from, LocalDate to);
 }
