@@ -1,36 +1,36 @@
 package com.company;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class AnalyticsManager {
     public double overallBalanceOfAccounts(List accounts){
         double overallBalance = 0;
-        for(account : accounts){
-            double balanceOfAccount = account.balanceOn();
-            overallBalance += balanceOfAccount;
-        }
+        overallBalance = accounts.stream().mapToDouble(account -> account.balanceOn).sum();
         return overallBalance;
     }
 
-    public Set uniqueKeysOf (List accounts, KeyExtractor keyExtractor){
-        Map uniqueKeys = new HashMap();
-        for (account : accounts){
-            uniqueKeys.putIfAbsent(keyExtractor, account);
-        }
+    public Set<KeyExtractor> uniqueKeysOf (List accounts, KeyExtractor keyExtractor){
+        Map<KeyExtractor, Object> uniqueKeys = new HashMap<KeyExtractor, Object>();
+        accounts.stream()
+                .forEach(account -> uniqueKeys.putIfAbsent(keyExtractor, account));
         return uniqueKeys.keySet();
     }
 
-
-
     public List accountsRangeFrom(List accounts, Account minAccount, Comparator comparator){
-        for (account : accounts){
-            int flag = comparator(account, minAccount);
-            if (flag < 0){
-                minAccount = account;
-            }
-        }
+        accounts.stream()
+                .filter(account -> account.id - minAccount.id < 0)
+                .forEach(account -> accounts.sort(comparator));
         return accounts;
     }
 
-   // Optional<Entry> maxExpenseAmountEntryWithinInterval(List<Account> accounts, LocalDate from, LocalDate to);
+    Optional<Entry> maxExpenseAmountEntryWithinInterval(List<Account> accounts, LocalDate from, LocalDate to) {
+        double maxAmount = 0;
+        /* history(from, to);
+        * accounts.stream()
+        *         .filter(account -> account.withdraw(double amount))
+                  .sorted(new AmountComparator());
+        *  сравнить их по сумме и затем взять последний аккаунт, и Entry на ту сумму соответственно.*/
+        return null;
+    }
 }
